@@ -1,0 +1,92 @@
+1>  Recursive-Based solution [TC: O(2^n) , SC: O(n)]
+class Solution {
+public:
+    int solve(vector<int>& nums, int curr_i, int prev_i) {
+        if (curr_i >= nums.size())  // Base case
+            return 0;
+        
+        int take = 0, skip = 0;
+        if (prev_i == -1 || nums[curr_i] > nums[prev_i]) {
+            take = 1 + solve(nums, curr_i + 1, curr_i);  // Include current element
+        }
+        skip = solve(nums, curr_i + 1, prev_i);  // Skip current element
+
+        return max(take, skip);  // Return the maximum length
+    }
+
+    int lengthOfLIS(vector<int>& nums) {
+        return solve(nums, 0, -1);
+    }
+};
+
+2> Memoization Based (2D dp as two variable changing) [TC: O(n^2), SC:O(n^2)]
+class Solution {
+public:
+    int solve(vector<int>& nums, int curr_i, int prev_i, vector<vector<int>>& dp) {
+        if (curr_i >= nums.size())  // Base case
+            return 0;
+
+        if (dp[curr_i][prev_i + 1] != -1)  // Use stored result
+            return dp[curr_i][prev_i + 1];
+        
+        int take = 0, skip = 0;
+        if (prev_i == -1 || nums[curr_i] > nums[prev_i]) {
+            take = 1 + solve(nums, curr_i + 1, curr_i, dp);  // Include current element
+        }
+        skip = solve(nums, curr_i + 1, prev_i, dp);  // Skip current element
+
+        return dp[curr_i][prev_i + 1] = max(take, skip);  // Store and return result
+    }
+
+    int lengthOfLIS(vector<int>& nums) {
+        int n = nums.size();
+        vector<vector<int>> dp(n, vector<int>(n + 1, -1));  // Initialize memo table
+        return solve(nums, 0, -1, dp);
+    }
+};
+
+3> Iterative Dp [TC: O(n^2), SC:O(n)]
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 0) return 0;
+
+        vector<int> dp(n, 1);  // Initialize DP array with 1 (each element is its own LIS)
+        int maxLIS = 1;
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = max(dp[i], dp[j] + 1);
+                }
+            }
+            maxLIS = max(maxLIS, dp[i]);  // Update maximum LIS
+        }
+
+        return maxLIS;
+    }
+};
+
+4> Binary Search in DP [TC: O(nlogn), SC: O(1)]
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        vector<int> temp;  // Simulates the LIS
+        for (int num : nums) {
+            // Find the position to replace using binary search
+            auto it = lower_bound(temp.begin(), temp.end(), num);
+            if (it == temp.end()) {
+                // Extend LIS
+                temp.push_back(num);
+            } else {
+                // Replace the element to maintain the smallest possible value
+                *it = num;
+            }
+        }
+        return temp.size();  // Length of LIS
+    }
+};
+
+
+
