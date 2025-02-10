@@ -1,0 +1,38 @@
+class Solution {
+public:
+int days_get(vector<int>&wt,int mid)
+{
+    int days_take=1,load=0;
+    for(int i=0;i<wt.size();i++)
+    {
+        if(wt[i]+load>mid)
+        {
+            load=wt[i];
+            days_take+=1;
+
+        }
+        else
+        {
+            load+=wt[i];
+        }
+    
+    }
+    return days_take;
+}
+    int shipWithinDays(vector<int>& wt, int days) {
+        int left=*max_element(wt.begin(),wt.end());
+        int right=accumulate(wt.begin(),wt.end(),0);
+        while(left<=right)
+        {
+            int mid=left+(right-left)/2;
+            int days_req=days_get(wt,mid);
+            if(days_req<=days)
+            {
+                right=mid-1;
+            }
+            else
+            left=mid+1;
+        }
+        return left;
+    }
+};
